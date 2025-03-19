@@ -25,10 +25,10 @@ generation_params:
   prompt        : ''
 
   # The maximum number of tokens to generate in the completion.
-  max_tokens    : 250
+  max_tokens    : 2500
 
   # float , optional, defaults to 1.0) — The value used to modulate the next token probabilities.
-  temperature   : 0.0
+  temperature   : 0.6
 
   # Returns the best `n` out of `best_of` completions made on server side
   n             : 1
@@ -41,7 +41,7 @@ generation_params:
   batch_response: False
 
   # If we want to do sample method of text generation or not
-  do_sample     : False
+  do_sample     : True
 
   # The parameter for repetition penalty. Between 1.0 and infinity. 1.0 means no penalty. Default to 1.0.
   repetition_penalty : 1.0
@@ -50,4 +50,4 @@ generation_params:
   top_k         : 50
 
   # If set to float < 1, only the most probable tokens with probabilities that add up to top_p or higher are kept for generation. Default to 1.0
-  top_p         : 1
+  top_p         : 0.95
