@@ -25,7 +25,7 @@ generation_params:
   prompt        : ''
 
   # The maximum number of tokens to generate in the completion.
-  max_tokens    : 2500
+  max_tokens    : 4000
 
   # float , optional, defaults to 1.0) — The value used to modulate the next token probabilities.
   temperature   : 0.6

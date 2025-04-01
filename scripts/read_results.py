@@ -9,6 +9,7 @@ import glob
 import json
 import os
 
+import numpy as np
 from tqdm import tqdm
 
 
@@ -43,16 +44,29 @@ def calculate_averages(folder_path):
     task_percent_complete_sum = sum(
         float(row["stats"]["task_percent_complete"]) for row in valid_data
     )
-    task_state_success_sum = sum(
+
+    # Success stats
+    task_state_success_all = [
         float(row["stats"]["task_state_success"]) for row in valid_data
-    )
-    sim_steps_sum = sum(int(row["stats"]["sim_step_count"]) for row in valid_data)
-    replanning_count_sum = sum(
+    ]
+    task_state_success_sum = sum(task_state_success_all)
+    task_state_success_std = np.std(task_state_success_all)
+
+    # Sim stats
+    sim_steps_all = [int(row["stats"]["sim_step_count"]) for row in valid_data]
+    sim_steps_sum = sum(sim_steps_all)
+    sim_steps_std = np.std(sim_steps_all)
+
+    # Replanning stats
+    replanning_count_all = [
         int(row["stats"]["replanning_count_0"]) for row in valid_data
-    )
+    ]
+    replanning_count_sum = sum(replanning_count_all)
+    replanning_count_std = np.std(replanning_count_all)
 
     avg_task_percent_complete = task_percent_complete_sum / valid_count
     avg_task_state_success = task_state_success_sum / valid_count
+    avg_task_state_success_std = task_state_success_std
     avg_sim_steps = sim_steps_sum / valid_count
     avg_replanning_count = replanning_count_sum / valid_count
 
@@ -60,11 +74,13 @@ def calculate_averages(folder_path):
         f"Average task_percent_complete for non-crashed episodes: {avg_task_percent_complete:.2f}"
     )
     print(
-        f"Average task_state_success for non-crashed episodes: {avg_task_state_success:.2f}"
+        f"Average task_state_success for non-crashed episodes: {avg_task_state_success:.2f} +/- {avg_task_state_success_std:.1f}"
     )
-    print(f"Average sim_steps for non-crashed episodes: {avg_sim_steps:.2f}")
     print(
-        f"Average replanning_count for non-crashed episodes: {avg_replanning_count:.2f}"
+        f"Average sim_steps for non-crashed episodes: {avg_sim_steps:.2f} +/- {sim_steps_std:.1f}"
+    )
+    print(
+        f"Average replanning_count for non-crashed episodes: {avg_replanning_count:.2f} +/- {replanning_count_std:.1f}"
     )
 
 
