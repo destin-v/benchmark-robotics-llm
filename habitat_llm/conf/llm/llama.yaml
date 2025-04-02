@@ -25,10 +25,10 @@ generation_params:
   prompt        : ''
 
   # The maximum number of tokens to generate in the completion.
-  max_tokens    : 4000
+  max_tokens    : 2000
 
   # float , optional, defaults to 1.0) — The value used to modulate the next token probabilities.
-  temperature   : 0.6
+  temperature   : 1.0
 
   # Returns the best `n` out of `best_of` completions made on server side
   n             : 1

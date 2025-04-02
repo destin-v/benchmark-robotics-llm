@@ -48,9 +48,9 @@ paths:
 
 evaluation:
   do_print: True
-  save_video: False
+  save_video: True
   log_data: True
-  save_rgb: False
+  save_rgb: True
   log_detailed_traces: True
 
 habitat:

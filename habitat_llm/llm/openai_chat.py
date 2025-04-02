@@ -8,7 +8,8 @@ import os
 from typing import Dict, List, Optional
 
 from omegaconf import DictConfig, OmegaConf
-from openai import AzureOpenAI
+from openai import OpenAI
+from rich.pretty import pprint
 
 from habitat_llm.llm.base_llm import BaseLLM, Prompt
 
@@ -38,6 +39,10 @@ class OpenAIChat(BaseLLM):
         :param conf: the configuration of the language model
         """
         self.llm_conf = conf
+        pprint("User configuration:")
+        pprint(dict(self.llm_conf), expand_all=True)
+        pprint(f"Model Selected: {self.llm_conf.model_selected}")
+
         self.generation_params = self.llm_conf.generation_params
         try:
             api_key = os.getenv("OPENAI_API_KEY")
@@ -49,11 +54,15 @@ class OpenAIChat(BaseLLM):
             assert len(endpoint) > 0, ValueError("No OPENAI_ENDPOINT keys provided")
         except Exception:
             raise ValueError("No OPENAI endpoint keys provided")
-        self.client = AzureOpenAI(
-            api_version="2024-06-01",
-            api_key=api_key,
-            azure_endpoint=f"https://{endpoint}",
-        )
+
+        # WARNING: AzureOpenAI is deprecated!  DO NOT USE!
+        # self.client = AzureOpenAI(
+        #     api_version="2024-06-01",
+        #     api_key=api_key,
+        #     azure_endpoint=f"https://{endpoint}",
+        # )
+
+        self.client = OpenAI()
         self._validate_conf()
         self.verbose = self.llm_conf.verbose
         self.verbose = True
@@ -110,8 +119,9 @@ class OpenAIChat(BaseLLM):
             messages.append(generate_message(prompt, image_detail=image_detail))
 
         text_response = self.client.chat.completions.create(
-            model=params["model"], messages=messages
+            model=self.llm_conf.model_selected, messages=messages
         )
+
         text_response = text_response.choices[0].message.content
         self.response = text_response
 

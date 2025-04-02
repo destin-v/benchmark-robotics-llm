@@ -9,14 +9,15 @@ defaults:
 
 agent_asymmetry: False
 world_model:
-  partial_obs: False
+  partial_obs: True
 
 evaluation:
   planner:
     plan_config:
-      constrained_generation: False
+      constrained_generation: True
       objects_response: True
       prompt_w_updatedobjects_only: False
-      replanning_threshold: 100
+      replanning_threshold: 50
       llm:
         inference_mode: "rlm"
+        model_selected: "gpt-4o"

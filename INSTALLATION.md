@@ -3,19 +3,19 @@
 ### Requirements:
 - Conda or Mamba
 
-### Create and activate Conda environment
+### 🐍 Create and activate Conda environment
 ```bash
 conda create -n habitat-llm  python=3.9.2 cmake=3.14.0 -y
 conda activate habitat-llm
 ```
 
-### Initialize third party submodules
+### 🎊 Initialize third party submodules
 ```bash
 git submodule sync
 git submodule update --init --recursive
 ```
 
-### Install dependencies and requirements
+### 🔧 Install dependencies and requirements
 ```bash
 # Adjust the cuda version depending on your hardware stack
 conda install pytorch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1 pytorch-cuda=12.4 -c pytorch -c nvidia -y
@@ -29,7 +29,9 @@ pip install -r requirements.txt
 ```
 If you have issues with library linking make sure that the conda libraries are in your LD_LIBRARY_PATH (e.g `export LD_LIBRARY_PATH=/path/to/anaconda/envs/myenv/lib:$LD_LIBRARY_PATH`)
 
-### Download datasets
+### 📀 Download datasets
+You may need to install a specific version of numpy to get the downloader to work. See [here](https://github.com/Genesis-Embodied-AI/Genesis/issues/117).
+
 ```bash
 # You may have to re-run downloader commands in case of network errors.
 python -m habitat_sim.utils.datasets_download --uids rearrange_task_assets hab_spot_arm hab3-episodes habitat_humanoids --data-path data/ --no-replace --no-prune
@@ -37,8 +39,16 @@ python -m habitat_sim.utils.datasets_download --uids rearrange_task_assets hab_s
 # Download ovmm objects
 git clone https://huggingface.co/datasets/ai-habitat/OVMM_objects data/objects_ovmm --recursive
 ```
+### ⚠️ If you cannot download the datasets above try switching your package versions:
+```bash
+# Retry the download after installing the following:
+pip install scipy==1.12.0 # make sure to run this before numpy or pandas install
+pip install numpy==1.25.1
+pip install pandas==2.0.3
+pip install opencv-python==4.10.0.82
+```
 
-### Setup HSSD scene dataset
+### 💿 Setup HSSD scene dataset
 ```bash
 # Download and link the data.
 git clone -b partnr https://huggingface.co/datasets/hssd/hssd-hab data/versioned_data/hssd-hab
@@ -48,7 +58,7 @@ cd ../../..
 ln -s versioned_data/hssd-hab data/hssd-hab
 ```
 
-### Download task datasets and neural network skill checkpoints
+### 💿 Download task datasets and neural network skill checkpoints
 
 ```bash
 # Download the data
@@ -80,16 +90,15 @@ pip install pre-commit && pre-commit install
 pip install -e .
 ```
 
-### Setup api keys if needed:
+### 🔑 Setup api keys if needed:
 ```bash
 # Add the following to your ~/.bashrc file
 export OPENAI_API_KEY=...
 ```
 
-### Run the tests
+### 🧪 Run the tests
 ```bash
 # make sure to use bash shell if on zsh
-bash
 
 # Download and link the data.
 git clone https://huggingface.co/datasets/ai-habitat/hssd-partnr-ci data/versioned_data/hssd-partnr-ci
@@ -105,7 +114,7 @@ ln -s versioned_data/partnr_episodes/test_rag data/test_rag
 python -m pytest habitat_llm/tests [-v]
 ```
 
-#### Troubleshooting
+#### ⚠️ Troubleshooting
 
 If the tests mentioned above fail due to scipy, numpy, pandas or opencv incompatibility, try installing the following alternate versions of selected packages which worked for us on Ubuntu 22.04.5 LTS:
 ```

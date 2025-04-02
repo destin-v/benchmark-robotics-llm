@@ -4,19 +4,20 @@ defaults:
   - /examples/planner_multi_agent_demo_config
   - override /evaluation: centralized_evaluation_runner_motortoolsonly_multiagent
   - override /planner@evaluation.planner: llm_centralized_motortoolsonly
-  - override /instruct@evaluation.planner.plan_config.instruct: few_shot_centralized_partial_obs_multiagent
+  - override /instruct@evaluation.planner.plan_config.instruct: zero_shot_centralized
 
 
 agent_asymmetry: False
 world_model:
-  partial_obs: True
+  partial_obs: False
 
 evaluation:
   planner:
     plan_config:
-      constrained_generation: False
+      constrained_generation: True
       objects_response: True
       prompt_w_updatedobjects_only: False
-      replanning_threshold: 100
+      replanning_threshold: 50
       llm:
         inference_mode: "rlm"
+        model_selected: "gpt-4o"

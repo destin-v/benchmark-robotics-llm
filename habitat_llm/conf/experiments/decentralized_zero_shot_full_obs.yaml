@@ -20,11 +20,12 @@ evaluation:
     agent_0:
       planner:
         plan_config:
-          constrained_generation: False
+          constrained_generation: True
           objects_response: True
           replanning_threshold: 50
           llm:
             inference_mode: "rlm"
+            model_selected: "gpt-4o"
     agent_1:
       planner:
         plan_config:
@@ -33,3 +34,4 @@ evaluation:
           replanning_threshold: 50
           llm:
             inference_mode: "rlm"
+            model_selected: "gpt-4o"
