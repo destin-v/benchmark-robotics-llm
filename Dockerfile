@@ -1,11 +1,19 @@
 #===================================================
 # Docker template with Micromamba (with GPU)
 # 
-# Build:
+# Build: (one-line)
 # >>> podman build --format docker -t <IMAGE NAME> <DOCKERFILE_PATH>
 #
-# Run:
-# >>> podman run -it --rm --env OPENAI_API_KEY --device nvidia.com/gpu=all <IMAGE NAME> bash
+# Run: (multi-line)
+# >>> podman run -it --rm \
+#   --env OPENAI_API_KEY \
+#   --env OPENAI_ENDPOINT \
+#   -v outputs:/root/benchmark-robotics-llm/outputs \
+#   --device nvidia.com/gpu=all \
+#   <IMAGE NAME> bash
+#
+# Run: (one-line)
+# >>> podman run -it --rm --env OPENAI_API_KEY --env OPENAI_ENDPOINT -v outputs:/root/benchmark-robotics-llm/outputs --device nvidia.com/gpu=all <IMAGE NAME> bash
 #
 # Description:
 # [x] Adds mamba package manager
@@ -20,6 +28,8 @@
 
 FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
 
+LABEL org.opencontainers.image.source https://github.com/destin-v/benchmark-robotics-llm
+
 # Disable interaction
 # Set ARG as this is only available during build
 ARG DEBIAN_FRONTEND=noninteractive
@@ -28,16 +38,34 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt -y update &&\ 
     apt -y upgrade &&\
     apt -y install \
-    vim \
+    build-essential \
+    ca-certificates \
     curl \
     freeglut3-dev \
     git \
     git-lfs \
     htop \
+    lcov \
+    libhdf5-dev \
+    libomp-dev \
+    libjpeg-dev \
+    libglm-dev \
+    libegl1-mesa-dev \
+    ninja-build \
     pipx \
     unzip \
-    wget &&\
+    vim \
+    wget \
+    xorg-dev \
+    zip &&\
     apt -y clean
+
+# Install CMake
+RUN wget https://cmake.org/files/v3.12/cmake-3.12.4-Linux-x86_64.sh
+RUN mkdir /opt/cmake312
+RUN sh ./cmake-3.12.4-Linux-x86_64.sh --prefix=/opt/cmake312 --skip-license
+RUN ln -s /opt/cmake312/bin/cmake /usr/local/bin/cmake
+RUN ln -s /opt/cmake312/bin/ctest /usr/local/bin/ctest
 
 # Install pipx
 RUN pipx ensurepath
@@ -61,7 +89,7 @@ RUN git clone --depth=1 https://github.com/amix/vimrc.git ~/.vim_runtime &&\
     sh ~/.vim_runtime/install_awesome_vimrc.sh
 
 # To create a Mamba environment.  Need --format docker in build.
-RUN micromamba create -n myenv python=3.9.2 cmake=3.14.0 -y
+RUN micromamba create -n myenv python=3.9.16 cmake=3.14.0 -y
 SHELL ["micromamba", "run", "-n", "myenv", "/bin/bash", "-c"]
 
 # Installation of Habitat & PARTNR LLM
@@ -116,7 +144,8 @@ RUN pip install pre-commit && pre-commit install
 RUN pip install -e .
 
 # Add the following to your ~/.bashrc file
-RUN export OPENAI_API_KEY="YOUR_OPENAI_KEY"
+ENV OPENAI_API_KEY="YOUR_OPENAI_KEY"
+ENV OPENAI_ENDPOINT="/v1/chat/completions"
 
 # Run tests
 # =========
@@ -127,9 +156,6 @@ RUN cd data/hssd-partnr-ci && git lfs pull
 
 # link RAG testing data
 RUN ln -s versioned_data/partnr_episodes/test_rag data/test_rag
-
-# ChatGPT settings
-ENV OPENAI_ENDPOINT=/v1/chat/completions
 
 EXPOSE 8080
 
