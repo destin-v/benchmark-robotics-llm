@@ -111,6 +111,28 @@ You can easily edit the `run_experiments.py` file to test a different model:
      
 ```
 
+# Ollama Server
+Use Ollama to host local models. Steps:
+
+1. Download [Ollama](https://ollama.com/download).
+2. Download a [model](https://ollama.com/library).
+3. Modify script to use Ollama (instructions below).
+
+From inside your container:
+```bash
+ollama serve # start server
+ollama pull gpt-oss:20b # pull a model
+```
+
+Edit the file: `habitat_llm/llm/openai_chat.py`:
+
+```python
+# line 65
+self.client = OpenAI(
+    base_url="http://localhost:11434/v1",  # Local Ollama API
+    api_key="ollama"                       # Dummy key
+)  
+```
 
 
 
