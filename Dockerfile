@@ -16,10 +16,11 @@
 # >>> podman run -it --rm --env OPENAI_API_KEY --env OPENAI_ENDPOINT -v outputs:/root/benchmark-robotics-llm/outputs --device nvidia.com/gpu=all <IMAGE NAME> bash
 #
 # Description:
-# [x] Adds mamba package manager
-# [x] Adds pipx package manager
-# [x] Adds oh-my-posh terminal
-# [x] Adds vim awesome
+# [x] Add mamba package manager
+# [x] Add pipx package manager
+# [x] Add oh-my-posh terminal
+# [x] Add vim awesome
+# [x] Add VsCode server
 # 
 # References:
 # * https://stackoverflow.com/questions/58269375/how-to-install-packages-with-miniconda-in-dockerfile
@@ -157,5 +158,17 @@ RUN cd data/hssd-partnr-ci && git lfs pull
 # link RAG testing data
 RUN ln -s versioned_data/partnr_episodes/test_rag data/test_rag
 
+# Add Ollama
+RUN curl -fsSL https://ollama.com/install.sh | sh
+
+# Add VsCode server for editing
+RUN curl -fsSL https://code-server.dev/install.sh | sh
+
 EXPOSE 8080
+
+# code-server by default runs on 127.0.0.1 (only reachable inside the container).
+ENTRYPOINT ["code-server", "--auth", "none", "--bind-addr", "0.0.0.0:8080"]
+
+# Connect to the VsCode server using:
+# 0.0.0.0:8080
 
