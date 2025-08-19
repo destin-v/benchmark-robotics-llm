@@ -42,6 +42,7 @@ RUN apt -y update &&\
     build-essential \
     ca-certificates \
     curl \
+    fontconfig \
     freeglut3-dev \
     git \
     git-lfs \
@@ -84,6 +85,11 @@ RUN curl -s https://ohmyposh.dev/install.sh | bash -s
 RUN echo 'eval "$(oh-my-posh init bash)"' >> ~/.bashrc
 RUN echo 'source .bashrc' >> ~/.profile
 RUN echo 'PATH=$PATH:~/.local/bin/' >> ~/.bashrc
+RUN wget -P ~/.local/share/fonts https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip \
+    && cd ~/.local/share/fonts \
+    && unzip JetBrainsMono.zip \
+    && rm JetBrainsMono.zip \
+    && fc-cache -fv
 
 # VIM configuration
 RUN git clone --depth=1 https://github.com/amix/vimrc.git ~/.vim_runtime &&\
@@ -163,9 +169,8 @@ RUN curl -fsSL https://ollama.com/install.sh | sh
 
 # Add VsCode server for editing
 RUN curl -fsSL https://code-server.dev/install.sh | sh
-
 EXPOSE 8080
-
+WORKDIR /root/benchmark-robotics-llm
 # code-server by default runs on 127.0.0.1 (only reachable inside the container).
 ENTRYPOINT ["code-server", "--auth", "none", "--bind-addr", "0.0.0.0:8080"]
 

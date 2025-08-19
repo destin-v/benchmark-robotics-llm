@@ -50,7 +50,7 @@ Everything is provided for you in a container.
 
 Run container:
 ---
-1. Setup your OpenAI API keys prior to starting.
+1. Setup your OpenAI API keys prior to starting. (OPTIONAL)
     ```bash
     export OPENAI_API_KEY="..."
     ```
@@ -62,10 +62,11 @@ Run container:
 
 3. Start container. The container is over **50GB**!
     ```bash
-    podman run -it --rm \
+    podman run --rm \
     --env OPENAI_API_KEY \
-    -v outputs:/root/benchmark-robotics-llm/outputs \
-    --device nvidia.com/gpu=all \ 
+    --volume $PWD/outputs:/root/benchmark-robotics-llm/outputs \
+    --device nvidia.com/gpu=all \
+    --publish 8080:8080 \
     ghcr.io/destin-v/benchmark-robotics-llm
     ```
 
@@ -77,7 +78,6 @@ Run container:
     localhost:8080
     ```
     ![Screenshot](./pics/screenshot-1.png)
-
 
 
 Inside container:
@@ -164,9 +164,9 @@ Use Ollama to host local models. Steps:
 ```bash
 podman run -it --rm \
 --env OPENAI_API_KEY \
--v outputs:/root/benchmark-robotics-llm/outputs \
+-v $PWD/outputs:/root/benchmark-robotics-llm/outputs \
 --device nvidia.com/gpu=all \
---entrypoint /bin/bash
+--entrypoint /bin/bash \
 ghcr.io/destin-v/benchmark-robotics-llm
 ```
 
@@ -175,13 +175,25 @@ ghcr.io/destin-v/benchmark-robotics-llm
 ---
 If you get an error stating that `proxies` does not exist, this is a bug in the OpenAI package.  Fix it by performing the following:
 
-1. Open file and go to line 773:
+1. Open file and go to line 777:
     ```bash
-    vim +773 /root/micromamba/envs/myenv/lib/python3.9/site-packages/openai/_base_client.py
+    vim +777 /root/micromamba/envs/myenv/lib/python3.9/site-packages/openai/_base_client.py
     ```
 2. Replace: `proxies` with `proxy`
 
 3. Save the edited file and now run: `python run_experiments.py`.
+
+### Out of Memory Error
+---
+To reduce memory usage you can turn off the `save_video` flag from within the container:
+
+```bash
+vim +51 /root/benchmark-robotics-llm/habitat_llm/conf/examples/planner_multi_agent_demo_config.yaml
+```
+
+```yaml
+save_video: False
+```
 
 # 👷🏻 Installation
 For manual installation **(not recommended)**, refer to [INSTALLATION.md](INSTALLATION.md)
