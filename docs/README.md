@@ -50,7 +50,7 @@ Everything is provided for you in a container.
 
 Run container:
 ---
-1. Setup your OpenAI API keys prior to starting.
+1. Setup your OpenAI API keys prior to starting. (OPTIONAL)
     ```bash
     export OPENAI_API_KEY="..."
     ```
