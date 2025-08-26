@@ -19,7 +19,15 @@
 </p>
 
 # 🤔 Description
-This is a fork of the PARTNR benchmark.  The original PARTNR benchmark was designed to run with Llama. This repo adds a script called `run_experiments.py` which allows users to benchmark agents from API providers that follow the OpenAI interface.
+> We actually are running out of actual test questions to ask.
+>
+> ... questions that are ridicously hard if not essentially impossible for humans that are written down questions are swiftly becoming trivial for AI.
+>
+> ... physics is the law ultimately everything else is a recommendation you can't break physics.  So, the ultimate test I think for whether an AI is the ultimate reasoning test is reality.
+> 
+> -- Elon Musk
+
+This is a fork of the PARTNR benchmark.  PARTNR creates randomized indoor tasks for agents to complete in a virtual environment.  The original PARTNR benchmark was designed to run with Llama. This repo adds a script called `run_experiments.py` which allows users to benchmark agents from API providers from different LLM models.
 
 # 🗺️ Information Flow
 Below is a figure showing the flow of information through decentralized planners in PARTNR. Please note that there is no explicit communication between the two decentralized planners. The [Environment Interface](./habitat_llm/agent/env/environment_interface.py) reads observations for each agent and sends them to the [Perception Module](./habitat_llm/perception/perception_sim.py). The processed observations are used to update the [World Graph](./habitat_llm/world_model/world_graph.py) and the [Planner](./habitat_llm/planner/planner.py) (based on an LLM or other system) uses the world graph and the task description to select a [Tool](./habitat_llm/tools/tool.py) to interact with the environment.
@@ -48,19 +56,22 @@ If you are low of RAM or VRAM, you will likely get an Out of Memory (OOM) error.
 Everything is provided for you in a container.
 
 
-Run container:
----
-1. Setup your OpenAI API keys prior to starting. (OPTIONAL)
-    ```bash
-    export OPENAI_API_KEY="..."
-    ```
+ ```bash
+brew install podman
+```
 
-2. Create a directory to save your experiments.
+**OPTIONAL:** Setup your OpenAI API
+```bash
+export OPENAI_API_KEY="..."
+```
+
+## Run container:
+1. Create a directory to save your experiments.
     ```bash
     mkdir outputs
     ```
 
-3. Start container. The container is over **50GB**!
+2. Start container. The container is over **50GB**!
     ```bash
     podman run --rm \
     --env OPENAI_API_KEY \
@@ -69,16 +80,17 @@ Run container:
     --publish 8080:8080 \
     ghcr.io/destin-v/benchmark-robotics-llm
     ```
+> [!TIP]
+> Use `--entrypoint /bin/bash` argument for standard bash.
 
-    > [!IMPORTANT]  
-    > Use `--entrypoint /bin/bash` argument for standard bash.
-
-4. Enter address in browser.
+3. Enter address in browser.
     ```bash
-    localhost:8080
+    localhost:8080/?folder=/root/benchmark-robotics-llm
     ```
     ![Screenshot](./pics/screenshot-1.png)
 
+> [!IMPORTANT]  
+> You will see output logs and files being generated in `outputs`.  Video files are generated be default, these use a lot fo GPU VRAM.  See instructions below for turning off the video saving if you have low VRAM.
 
 Inside container:
 ---
@@ -159,19 +171,31 @@ Use Ollama to host local models. Steps:
 
 # 🐛 Troubleshooting
 
-### Enter Container
+## Enter Container
 ---
+
+### Podman
 ```bash
 podman run -it --rm \
 --env OPENAI_API_KEY \
--v $PWD/outputs:/root/benchmark-robotics-llm/outputs \
+--volume $PWD/outputs:/root/benchmark-robotics-llm/outputs \
 --device nvidia.com/gpu=all \
 --entrypoint /bin/bash \
 ghcr.io/destin-v/benchmark-robotics-llm
 ```
 
+### Docker
+```bash
+docker run -it --rm \
+--env OPENAI_API_KEY \
+--volume $PWD/outputs:/root/benchmark-robotics-llm/outputs \
+--gpus all \
+--entrypoint /bin/bash \
+ghcr.io/destin-v/benchmark-robotics-llm
+```
 
-### Proxy Error
+
+## Proxy Error
 ---
 If you get an error stating that `proxies` does not exist, this is a bug in the OpenAI package.  Fix it by performing the following:
 
@@ -183,9 +207,9 @@ If you get an error stating that `proxies` does not exist, this is a bug in the 
 
 3. Save the edited file and now run: `python run_experiments.py`.
 
-### Out of Memory Error
+## Out of Memory Error
 ---
-To reduce memory usage you can turn off the `save_video` flag from within the container:
+By default, the videos of each episode are saved, but this is very **GPU memory intensive**!  To reduce memory usage you can turn off the `save_video` flag from within the container:
 
 ```bash
 vim +51 /root/benchmark-robotics-llm/habitat_llm/conf/examples/planner_multi_agent_demo_config.yaml
@@ -196,6 +220,22 @@ save_video: False
 ```
 
 # 👷🏻 Installation
+
+## Container Build
+
+### Podman
+
+Rebuilding from the `Dockerfile` can take over an hour.
+```bash
+podman build --format docker -t benchmark_robotics .
+```
+
+### Docker
+```bash
+docker build -t benchmark_robotics .
+```
+
+## Manual
 For manual installation **(not recommended)**, refer to [INSTALLATION.md](INSTALLATION.md)
 
 # 📑 Citation
