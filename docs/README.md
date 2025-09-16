@@ -143,8 +143,16 @@ You can easily edit the `run_experiments.py` file to test a different model:
 ```
 
 # 🦙 Ollama Server
-Use Ollama to host local models. Steps:
 
+1. Enter container.
+   ```bash
+    podman run --rm \
+    --device nvidia.com/gpu=all \
+    --publish 8080:8080 \
+    --entrypoint /bin/bash \
+    ghcr.io/destin-v/benchmark-robotics-llm
+    ```
+   
 > [!NOTE]
 > The container already has  [Ollama](https://ollama.com/download) pre-installed.
 > ```bash
@@ -152,15 +160,15 @@ Use Ollama to host local models. Steps:
 > curl -fsSL https://ollama.com/install.sh | sh
 > ```
 
-1. Start Ollama.
+2. Start Ollama.
     ```bash
     ollama serve
     ```
-2. Download a model from the [library](https://ollama.com/library).
+3. Download a model from the [library](https://ollama.com/library).
     ```bash
     ollama pull gpt-oss:20b
     ```
-3. Modify script to use Ollama (instructions below).
+4. Modify script to use Ollama (instructions below).
     ```bash
     vim +65 habitat_llm/llm/openai_chat.py
     ```
@@ -171,7 +179,7 @@ Use Ollama to host local models. Steps:
         api_key="ollama"                       # Dummy key
     )  
     ```
-4. Configure your `run_experiments.py` script.
+5. Configure your `run_experiments.py` script.
    ```python
     if __name__ == "__main__":
      """This needs to be run in a terminal."""
