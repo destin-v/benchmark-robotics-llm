@@ -145,19 +145,22 @@ You can easily edit the `run_experiments.py` file to test a different model:
 # 🦙 Ollama Server
 Use Ollama to host local models. Steps:
 
-1. Download [Ollama](https://ollama.com/download).
-    ```bash
-    curl -fsSL https://ollama.com/install.sh | sh
-    ```
-2. Start Ollama.
+> [!NOTE]
+> The container already has  [Ollama](https://ollama.com/download) pre-installed.
+> ```bash
+> # You can reinstall Ollama if you need the newest version.
+> curl -fsSL https://ollama.com/install.sh | sh
+> ```
+
+1. Start Ollama.
     ```bash
     ollama serve
     ```
-3. Download a model from the [library](https://ollama.com/library).
+2. Download a model from the [library](https://ollama.com/library).
     ```bash
     ollama pull gpt-oss:20b
     ```
-4. Modify script to use Ollama (instructions below).
+3. Modify script to use Ollama (instructions below).
     ```bash
     vim +65 habitat_llm/llm/openai_chat.py
     ```
@@ -168,7 +171,32 @@ Use Ollama to host local models. Steps:
         api_key="ollama"                       # Dummy key
     )  
     ```
-
+4. Configure your `run_experiments.py` script.
+   ```python
+    if __name__ == "__main__":
+     """This needs to be run in a terminal."""
+ 
+     # Start timer.
+     timeout: int = 360 # modify this to extend the test time
+     start_time: float = time.time()
+     final_time: float = time.time()
+ 
+     processes: list[Popen] = []
+   
+     # ADD YOUR MODEL NAME HERE
+     processes.extend(test_runner("gpt-oss:20b")) # set your desired models
+ 
+     # Wait until timeout.
+     while abs(final_time - start_time) < timeout:
+         final_time: float = time.time()
+         time.sleep(1)
+ 
+     # Kill all processes.
+     for process in processes:
+         process.kill()
+     print("Timeout Reached!")
+     ```
+   
 # 🐛 Troubleshooting
 
 ## Enter Container
